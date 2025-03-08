@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# 이 파일은 Jenkins에서 Execute Shell에 작성한 script 내용입니다.
+
 # 명령어 실패 시 스크립트 종료
 set -euo pipefail
 
