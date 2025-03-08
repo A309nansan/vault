@@ -1,5 +1,7 @@
 #!/bin/bash
-set -euo pipefail  # 명령어 실패 시 스크립트 종료
+
+# 명령어 실패 시 스크립트 종료
+set -euo pipefail
 
 # 로그 출력 함수
 log() {
@@ -16,28 +18,30 @@ trap 'error $LINENO' ERR
 
 log "스크립트 실행 시작."
 
-# docker network 생성 (이미 존재하면 스킵)
+# docker network 생성
 if docker network ls --format '{{.Name}}' | grep -q '^nansan-network$'; then
-  log "Docker network 'nansan-network'가 이미 존재합니다. 생성 스킵."
+  log "Docker network named 'nansan-network' is already existed."
 else
-  log "Docker network 'nansan-network' 생성 중."
+  log "Docker network named 'nansan-network' is creating..."
   docker network create --driver bridge nansan-network
 fi
 
-# vault 이미지 빌드
-log "vault 이미지 빌드 시작."
+# 기존 vault 이미지를 삭제하고 새로 빌드
+log "vault image remove and build."
+docker rmi vault:latest || true
 docker build -t vault:latest .
 
-# vault 작업 공간을 mount할 폴더 미리 생성
-log "vault의 volume을 mount할 Host Machine에 /var/vault 만드는중..."
-sudo mkdir -p /var/vault/config
-sudo chown -R 1000:1000 /var/vault
-sudo chown -R 1000:1000 /var/vault/config
-
-cp vault.json /var/vault/config
-
 # Docker Compose로 서비스 실행
-log "Docker Compose로 서비스 실행 중..."
-docker compose up -d
+log "Execute vault..."
+docker run -d \
+  --name vault \
+  --restart unless-stopped \
+  -e VAULT_ADDR=http://vault:8200 \
+  --cap-add IPC_LOCK \
+  -p 8200:8200 \
+  -v /var/vault/file:/vault/file \
+  -v /var/vault/logs:/vault/logs \
+  --network nansan-network \
+  vault:latest
 
 echo "작업이 완료되었습니다."
