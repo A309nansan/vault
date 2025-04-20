@@ -28,6 +28,10 @@ else
   docker network create --driver bridge nansan-network
 fi
 
+# 실행중인 vault Container를 삭제
+log "vault container remove"
+docker rm -f vault
+
 # 기존 vault 이미지를 삭제하고 새로 빌드
 log "vault image remove and build."
 docker rmi vault:latest || true
