@@ -5,6 +5,9 @@ FROM hashicorp/vault:latest
 ENV TZ=Asia/Seoul
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
+# vault.json 파일을 /vault/config/로 복사
+COPY vault.json /vault/config/vault.json
+
 # Vault가 서비스를 제공하는 기본 포트
 EXPOSE 8200
 
