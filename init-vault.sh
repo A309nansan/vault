@@ -38,12 +38,12 @@ log "Execute vault..."
 docker run -d \
   --name vault \
   --restart unless-stopped \
-  -e VAULT_ADDR=http://vault:8200 \
-  --cap-add IPC_LOCK \
-  -p 8200:8200 \
   -v /var/vault/file:/vault/file \
   -v /var/vault/logs:/vault/logs \
+  -e VAULT_ADDR=http://vault:8200 \
+  -p 8200:8200 \
   --network nansan-network \
+  --cap-add IPC_LOCK \
   vault:latest
 
 echo "작업이 완료되었습니다."
