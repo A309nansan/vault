@@ -37,7 +37,7 @@ log "vault image remove and build."
 docker rmi vault:latest || true
 docker build -t vault:latest .
 
-# Docker Compose로 서비스 실행
+# Vault 서비스 실행
 log "Execute vault..."
 docker run -d \
   --name vault \
@@ -45,7 +45,7 @@ docker run -d \
   -v /var/vault/file:/vault/file \
   -v /var/vault/logs:/vault/logs \
   -e VAULT_ADDR=http://vault:8200 \
-  -p 8200:8200 \
+  -p 13100:8200 \
   --network nansan-network \
   --cap-add IPC_LOCK \
   vault:latest
